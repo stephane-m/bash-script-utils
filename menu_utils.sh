@@ -5,10 +5,30 @@
 #
 
 #==============================
+# Variables
+#==============================
+
+# character used to draw menu horizontal lines
+menu_line_char='-'
+
+# character used to draw menu corners
+menu_corner_char='+'
+
+# character used to draw menu vartical lines
+menu_col_char='|'
+
+# padding added on the left of menu
+menu_left_padding='   '
+
+# location of the current script
+_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+#==============================
 # Imports
 #==============================
 
-source ./logging.sh
+source ${_SCRIPT_DIR}/logging.sh
 
 
 #==============================
@@ -22,25 +42,31 @@ source ./logging.sh
 #
 function show_menu_selection() {
 
+	local menu_t=$1
+
+	shift
 	local menu_entries=$*
 
 	local counter=1
 
-	# getting the length of the longest meny key
-	local max_menu_key_length=0
+	# getting the length of the longest menu key or title
+	local max_menu_key_length=${#menu_t}
 	for menu_selection_entry in ${menu_entries[*]}; do
 		entry_key=${menu_selection_entry%%=*}
 		if [ ${#entry_key} -gt $max_menu_key_length ]; then max_menu_key_length=${#entry_key}; fi
 	done
-
-	menu_border=`printf "+%$((max_menu_key_length + 7))s+" | tr ' ' -`
-	printf "${menu_border}\n"
+	
+	menu_border=`printf "${menu_corner_char}%$((max_menu_key_length + 7))s${menu_corner_char}" | tr ' ' $menu_line_char`
+	printf "${menu_left_padding}${menu_border}\n"
+	
+	printf "${menu_left_padding}${menu_col_char} %-$((max_menu_key_length + 6))s${menu_col_char}\n" "$menu_t"
+	printf "${menu_left_padding}${menu_border}\n"
 	for menu_selection_entry in ${menu_entries[*]}; do
 		entry_key=${menu_selection_entry%%=*}
-		printf "|%3d : %-$((max_menu_key_length + 1))s|\n" $counter $entry_key
+		printf "${menu_left_padding}${menu_col_char}%3d : %-$((max_menu_key_length + 1))s${menu_col_char}\n" $counter $entry_key
 		let counter+=1
 	done
-	printf "${menu_border}\n"
+	printf "${menu_left_padding}${menu_border}\n"
 }
 
 
@@ -49,6 +75,7 @@ function show_menu_selection() {
 # 
 # Input parameters:
 #  - 1 : a variable in which the selected value will be stored
+#  - 2 : menu title
 #  - * : After the first parameter, a list of key=value pair. The key will be used to be displayed
 #        on the select menu to the user, the selected value will be returned in the first paramter.
 #
@@ -57,21 +84,21 @@ function generate_enumerated_menu() {
 	# first parameter is the returned value
 	local __returnvar=$1
 
-	# getting all parameters as we expect array as input
-	local all_parameters=$@
+	local menu_title=$2
 
-	# removing first param from all param to keep only the menu array
-	local menu_entries_as_str=("${all_parameters[@]/$__returnvar}")
+	shift
+	shift
+	menu_entries_as_str=$@
 	
 	# convert menu entries as string into array
 	local menu_entries=($menu_entries_as_str)
 
 	# display the select menu
-	show_menu_selection ${menu_entries[@]}
+	show_menu_selection "${menu_title}" ${menu_entries[@]}
 
 	local counter=1
 
-	printf "Please select an entry: "
+	printf "${menu_left_padding} > "
 	
 	# read the input and return selected value
 	read menu_selection_input

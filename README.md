@@ -6,3 +6,4 @@ The script are mean to be used by some other scripts, they provide uniformed sta
 * logging.sh : provides function to log messages with coloration and date.
 * menu_utils.sh : generates a select menu using an input map.
 * array_utils.sh : utilities function for map and array.
+* __test__ : this folder contains scripts to test/demo the utils scripts
