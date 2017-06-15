@@ -8,7 +8,7 @@
 # Imports
 #==============================
 
-source ~/scripts/utils/logging.sh
+source ./logging.sh
 
 
 #==============================
