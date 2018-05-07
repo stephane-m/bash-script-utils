@@ -1,7 +1,8 @@
 #!/bin/sh
 
 #
-# This script offers utilities to generate script menu.
+# This script offers utilities to generate simple script menu.
+# See at https://github.com/stephane-m/bash-script-utils/edit/master/menu_utils.sh
 #
 
 #==============================
