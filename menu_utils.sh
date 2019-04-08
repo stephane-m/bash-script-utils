@@ -56,10 +56,10 @@ function show_menu_selection() {
 		entry_key=${menu_selection_entry%%=*}
 		if [ ${#entry_key} -gt $max_menu_key_length ]; then max_menu_key_length=${#entry_key}; fi
 	done
-	
+
 	menu_border=`printf "${menu_corner_char}%$((max_menu_key_length + 7))s${menu_corner_char}" | tr ' ' $menu_line_char`
 	printf "${menu_left_padding}${menu_border}\n"
-	
+
 	printf "${menu_left_padding}${menu_col_char} %-$((max_menu_key_length + 6))s${menu_col_char}\n" "$menu_t"
 	printf "${menu_left_padding}${menu_border}\n"
 	for menu_selection_entry in ${menu_entries[*]}; do
@@ -73,24 +73,27 @@ function show_menu_selection() {
 
 #
 # This method generates an enumerated selection menu.
-# 
+#
 # Input parameters:
-#  - 1 : a variable in which the selected value will be stored
-#  - 2 : menu title
+#  - 1 : a variable in which the selected key will be stored
+#  - 2 : a variable in which the selected value will be stored
+#  - 3 : menu title
 #  - * : After the first parameter, a list of key=value pair. The key will be used to be displayed
 #        on the select menu to the user, the selected value will be returned in the first paramter.
 #
 function generate_enumerated_menu() {
 
 	# first parameter is the returned value
-	local __returnvar=$1
+	local __returnvarkey=$1
+	local __returnvarvalue=$2
 
-	local menu_title=$2
+	local menu_title=$3
 
+	shift
 	shift
 	shift
 	menu_entries_as_str=$@
-	
+
 	# convert menu entries as string into array
 	local menu_entries=($menu_entries_as_str)
 
@@ -100,7 +103,7 @@ function generate_enumerated_menu() {
 	local counter=1
 
 	printf "${menu_left_padding} > "
-	
+
 	# read the input and return selected value
 	read menu_selection_input
 	log_debug "Menu select input : ${menu_selection_input}"
@@ -112,5 +115,6 @@ function generate_enumerated_menu() {
 		exit 1
 	fi
 
-	eval $__returnvar="${menu_entries[menu_map_index]##*=}"
+	eval $__returnvarkey="${menu_entries[menu_map_index]%%=*}"
+	eval $__returnvarvalue="${menu_entries[menu_map_index]##*=}"
 }
